@@ -1,0 +1,25 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+
+# Data & outputs
+data/
+*.png
+*.tif
+*.tiff
+
+# OS / editors
+.DS_Store
+.vscode/
+.idea/
+
+# but keep committed figures
+!assets/
+!assets/*.png
