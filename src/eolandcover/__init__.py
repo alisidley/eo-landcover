@@ -1,15 +1,15 @@
 """eo-landcover — land-cover classification and change detection from satellite imagery.
 
-A learning project built around Sentinel-2 imagery (EuroSAT). The reusable core
-here is domain logic that needs no heavy dependencies and is fully tested:
+An Earth-observation project built around Sentinel-2 imagery (EuroSAT). The core
+is domain logic that needs no heavy dependencies and is fully tested:
 
 * ``indices``  — spectral indices (NDVI, normalised differences) from bands;
 * ``metrics``  — classification metrics (accuracy, per-class, confusion matrix);
 * ``change``   — change detection from image embeddings (distance + thresholding);
 * ``split``    — stratified train/validation/test splits.
 
-The satellite-imagery modelling (``data``, ``model``, ``train``) lives behind the
-optional ``torch`` extra and is a guided scaffold — see the README roadmap.
+The satellite-imagery parts (``data`` loading/features, and the planned ``model``
+embeddings) use the optional ``torch`` extra — see the README roadmap.
 """
 from __future__ import annotations
 

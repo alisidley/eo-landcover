@@ -1,8 +1,8 @@
-"""Explore EuroSAT (needs the ``torch`` extra).
+"""Explore EuroSAT — build intuition for the data before modelling.
 
-Goal: build intuition for the data before modelling. Run after
-`pip install -e '.[torch]'`.
-
+Prints the dataset size and class names, inspects one sample's structure, and
+checks that NDVI behaves as expected (vegetation > built-up). Needs the ``torch``
+extra:  pip install -e '.[torch]'
 """
 from __future__ import annotations
 
@@ -14,19 +14,39 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
 from eolandcover.data import load_eurosat
 from eolandcover.indices import ndvi
 
+# Sentinel-2 band order in EuroSAT: B01, B02, B03, B04(red), ..., B08(NIR), ...
+RED, NIR = 3, 7
+
+
+def first_of_class(dataset, class_index: int):
+    """Return the first sample whose label is ``class_index``."""
+    for sample in dataset:
+        if int(sample["label"]) == class_index:
+            return sample
+    raise ValueError(f"no sample found for class index {class_index}")
+
 
 def main() -> None:
-    dataset = load_eurosat(root="data", download=True)  # implement in eolandcover.data
+    dataset = load_eurosat(root="data", download=True)
+    classes = list(dataset.classes)
 
-    # TODO (your turn):
-    #   1. Print len(dataset) and the list of class names.
-    #   2. Take one sample; print the image tensor's shape and dtype.
-    #      Sentinel-2 EuroSAT has 13 bands — which indices are red (B4) and NIR (B8)?
-    #   3. Compute the mean NDVI of a 'Forest' patch and a 'Highway' patch with
-    #      `ndvi(nir_band, red_band)` and confirm forest is higher.
-    #   4. If matplotlib is installed, show an RGB composite (bands B4, B3, B2).
-    print(f"dataset loaded: {len(dataset)} samples")
-    _ = ndvi  # used once you implement step 3
+    print(f"samples: {len(dataset)}")
+    print(f"classes ({len(classes)}): {classes}")
+
+    sample = dataset[0]
+    img = sample["image"]
+    print(f"sample keys: {list(sample.keys())}")
+    print(f"image shape: {tuple(img.shape)}  dtype: {img.dtype}")  # (bands, H, W)
+    print(f"label: {int(sample['label'])} -> {classes[int(sample['label'])]}")
+
+    # NDVI sanity check: vegetation should score higher than built-up land.
+    forest = first_of_class(dataset, classes.index("Forest"))["image"].float()
+    highway = first_of_class(dataset, classes.index("Highway"))["image"].float()
+    forest_ndvi = float(ndvi(forest[NIR], forest[RED]).mean())
+    highway_ndvi = float(ndvi(highway[NIR], highway[RED]).mean())
+    print(f"mean NDVI — Forest: {forest_ndvi:.3f}  Highway: {highway_ndvi:.3f}")
+    print("NDVI higher for Forest (as expected)" if forest_ndvi > highway_ndvi
+          else "unexpected: Highway NDVI >= Forest — check the band indices")
 
 
 if __name__ == "__main__":

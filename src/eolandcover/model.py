@@ -1,37 +1,33 @@
 """Models and embeddings for EuroSAT (optional ``torch`` extra).
 
-Two routes, in increasing ambition:
+Planned (roadmap), in increasing ambition:
   * a pretrained CNN fine-tuned (or used as a fixed feature extractor) for the
     10-class land-cover task;
   * the same CNN with its classification head removed, used to produce
     *embeddings* that feed `eolandcover.change` for change detection.
 
-Guided scaffold — install the extra first:  pip install -e '.[torch]'
+Not yet implemented — install the extra when building this out:
+    pip install -e '.[torch]'
 """
 from __future__ import annotations
 
 
 def build_classifier(num_classes: int = 10, in_channels: int = 13):
-    """Return a CNN classifier for EuroSAT.
+    """Return a CNN classifier for EuroSAT. *(Planned — not yet implemented.)*
 
-    TODO (your turn):
-      1. TorchGeo ships models pretrained on satellite imagery, e.g.
-         `from torchgeo.models import resnet18, ResNet18_Weights`.
-      2. Build a ResNet-18 with `in_channels` (Sentinel-2 has 13 bands) and
-         `num_classes` outputs. Start with weights frozen (feature extractor),
-         then try fine-tuning.
-      3. Return the model.
+    Intended approach: use a TorchGeo model pretrained on satellite imagery
+    (e.g. ``from torchgeo.models import resnet18, ResNet18_Weights``), built for
+    ``in_channels`` (Sentinel-2 has 13 bands) and ``num_classes`` outputs — first
+    as a frozen feature extractor, then optionally fine-tuned.
     """
-    raise NotImplementedError("Build a (pretrained) classifier — see the TODO.")
+    raise NotImplementedError("build_classifier is planned — see the roadmap in the README.")
 
 
 def embed(model, images):
-    """Return embeddings (features before the classification head) for a batch.
+    """Return embeddings (features before the classification head). *(Planned.)*
 
-    TODO (your turn):
-      1. Take `model` from `build_classifier` and run images through everything
-         except the final linear layer (e.g. replace the head with `nn.Identity`).
-      2. Return the resulting vectors as a NumPy array.
-      3. Feed before/after embeddings to `eolandcover.change.change_scores`.
+    Intended approach: run ``images`` through ``model`` with the final linear layer
+    replaced by an identity, returning the vectors as a NumPy array suitable for
+    ``eolandcover.change.change_scores``.
     """
-    raise NotImplementedError("Produce embeddings — see the TODO.")
+    raise NotImplementedError("embed is planned — see the roadmap in the README.")

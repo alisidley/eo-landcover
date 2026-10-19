@@ -2,30 +2,23 @@
 
 **Land-cover classification and change detection from Sentinel-2 satellite imagery.**
 
-A hands-on project for learning the Earth-observation / remote-sensing stack, built
-around **EuroSAT** (Sentinel-2 patches, 10 land-cover classes). It mirrors the shape
-of real operational work — extract validated markers from satellite imagery, then
-move from simple features to learned embeddings and change detection.
+An Earth-observation project built around **EuroSAT** (Sentinel-2 patches, 10
+land-cover classes). It mirrors the shape of real operational work: extract
+validated markers from satellite imagery, starting from simple interpretable
+features and moving toward learned embeddings and change detection.
 
-> This is partly a **learning scaffold**: the reusable domain logic is implemented
-> and tested, while the satellite-imagery modelling is left as guided `TODO`s so the
-> remote-sensing part is something I build and understand, not a black box.
+## What's here
 
-## What's implemented (tested, no heavy deps)
-
+- **`data`** — load EuroSAT via TorchGeo and reduce each patch to per-band summary
+  features (mean, std) plus NDVI for a fast baseline.
 - **`indices`** — spectral indices (NDVI and normalised differences) from bands.
-- **`metrics`** — accuracy, per-class accuracy, confusion matrix (per-class matters:
-  land-cover classes are imbalanced).
+- **`metrics`** — accuracy, per-class accuracy, confusion matrix, and a confusion-matrix
+  plot (per-class matters: land-cover classes are imbalanced).
 - **`change`** — change detection from image embeddings (cosine distance + thresholding).
 - **`split`** — stratified train/val/test splits that preserve class proportions.
-- Tests + GitHub Actions CI (lint + test on Python 3.10 / 3.12).
-
-## What's a guided scaffold (the learning)
-
-- **`data`** — load EuroSAT via TorchGeo; turn patches into simple features.
-- **`model`** — a pretrained CNN classifier, and the same model as an embedding extractor.
-- **`examples/02_train_baseline.py`** — the end-to-end baseline, wired up and waiting
-  for the `data` TODOs.
+- **`examples/`** — explore the data, run the baseline, and a change-detection demo.
+- Tests + GitHub Actions CI (lint + test on Python 3.10 / 3.12). The core modules
+  need no heavy dependencies; the imagery work sits behind the optional `torch` extra.
 
 ## Quickstart
 
@@ -68,24 +61,22 @@ The baseline's main weakness is precisely the class defined by spatial structure
 which is the motivation for the next step: a representation that **keeps** spatial
 layout (a CNN, or embeddings from one).
 
-## Learning roadmap
+## Roadmap
 
-1. **Explore** — load EuroSAT, look at a few patches and their bands, compute NDVI.
-   Learn how Sentinel-2 imagery is shaped (13 bands, patch size, class labels).
-2. **Baseline** — per-band summary features + NDVI → RandomForest; report accuracy,
-   per-class accuracy, confusion matrix. A no-deep-learning number to beat.
-3. **Embeddings** — use a pretrained (satellite) CNN as a feature extractor; classify
-   from embeddings; compare to the baseline.
-4. **Change detection** — embed two acquisitions of the same area and flag change by
-   embedding distance (`change.py`) — the direction operational teams are moving.
-5. **Write it up** — a short README results section + a blog-style note, the same
-   "document and communicate" habit the work itself needs.
+- [x] **Explore** — load EuroSAT; inspect bands, patch shape, and NDVI.
+- [x] **Baseline** — per-band features + NDVI → RandomForest, with per-class accuracy
+  and confusion matrix (**88%** test — see Results).
+- [ ] **Embeddings** — use a pretrained (satellite) CNN as a feature extractor and
+  classify from embeddings; compare against the baseline, especially on Highway.
+- [ ] **Change detection on real imagery** — embed two Sentinel-2 acquisitions of the
+  same area and flag change by embedding distance (`change.py` already does the
+  distance/thresholding; this wires in real pairs).
 
 ## Why this project
 
 Earth observation turns satellite data into decisions about agriculture, land, and
 climate. The hard part is rarely a single model — it's validated, reproducible markers
-and honest evaluation on messy real-world imagery. This repo is scaffolded around that:
+and honest evaluation on messy real-world imagery. This repo is built around that:
 metrics and splits that don't fool you, simple interpretable features before fancy ones,
 and change detection framed as a distance in a learned space.
 

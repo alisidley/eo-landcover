@@ -4,7 +4,7 @@ EuroSAT is the standard starter dataset for satellite imagery: 27,000 Sentinel-2
 patches labelled with 10 land-cover classes (forest, river, residential, crops,
 pasture, ...). TorchGeo can download and load it for you.
 
-This is a guided scaffold — the TODOs are the learning. Install the extra first:
+Requires the optional ``torch`` extra:
     pip install -e '.[torch]'
 """
 from __future__ import annotations
