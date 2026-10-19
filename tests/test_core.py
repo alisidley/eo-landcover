@@ -10,6 +10,7 @@ from eolandcover import (
     ndvi,
     normalised_difference,
     per_class_accuracy,
+    plot_confusion_matrix,
     stratified_split,
 )
 
@@ -74,3 +75,12 @@ def test_stratified_split_preserves_classes_and_is_disjoint():
 def test_stratified_split_rejects_bad_fractions():
     with pytest.raises(ValueError):
         stratified_split([0, 1, 2], (0.5, 0.3, 0.3))
+
+
+# --- plotting (skips when matplotlib isn't installed, e.g. in CI) ---
+def test_plot_confusion_matrix_writes_file(tmp_path):
+    pytest.importorskip("matplotlib")
+    cm = np.array([[5, 1], [2, 4]])
+    out = tmp_path / "cm.png"
+    path = plot_confusion_matrix(cm, ["a", "b"], path=str(out))
+    assert out.exists() and path == str(out)

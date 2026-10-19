@@ -15,7 +15,7 @@ from __future__ import annotations
 
 from .change import change_scores, cosine_distance, flag_changes
 from .indices import ndvi, normalised_difference
-from .metrics import accuracy, confusion_matrix, per_class_accuracy
+from .metrics import accuracy, confusion_matrix, per_class_accuracy, plot_confusion_matrix
 from .split import stratified_split
 
 __all__ = [
@@ -27,6 +27,7 @@ __all__ = [
     "ndvi",
     "normalised_difference",
     "per_class_accuracy",
+    "plot_confusion_matrix",
     "stratified_split",
 ]
 __version__ = "0.1.0"

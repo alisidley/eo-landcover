@@ -42,8 +42,31 @@ For the imagery work (downloads EuroSAT the first time):
 ```bash
 pip install -e '.[torch]'
 python examples/01_explore_eurosat.py   # look at a few patches + their NDVI
-python examples/02_train_baseline.py    # after you implement the data TODOs
+python examples/02_train_baseline.py    # train + evaluate the baseline
 ```
+
+## Results — baseline
+
+Each 64×64 patch is reduced to simple, interpretable features — per-band mean and
+standard deviation plus mean NDVI — and classified with a RandomForest on a
+stratified 70/15/15 split. No deep learning.
+
+**Test accuracy: 88%** across the 10 classes (chance is 10%); validation 88.5% and
+test 88.0% track closely, so the model isn't overfitting.
+
+![EuroSAT confusion matrix — baseline](assets/confusion_matrix.png)
+
+The confusion matrix (row-normalised, so the diagonal is per-class recall) tells a
+clear story. Spectrally uniform classes are easy — **Forest 0.99, SeaLake 0.98**.
+The one weak class is **Highway (0.56)**, which scatters into AnnualCrop,
+Residential, Industrial and others.
+
+That failure is informative rather than disappointing: a highway is a **thin, linear**
+feature, and collapsing a patch to per-band *statistics* discards *where* things
+are — so a mostly-crop patch with a road through it looks spectrally like crops.
+The baseline's main weakness is precisely the class defined by spatial structure,
+which is the motivation for the next step: a representation that **keeps** spatial
+layout (a CNN, or embeddings from one).
 
 ## Learning roadmap
 

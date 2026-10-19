@@ -11,32 +11,40 @@ from __future__ import annotations
 
 from pathlib import Path
 
+import numpy as np
+
+from .indices import ndvi
+
 
 def load_eurosat(root: str | Path = "data", download: bool = True):
-    """Return a TorchGeo EuroSAT dataset.
+    """Load the EuroSAT dataset (Sentinel-2, 10 land-cover classes) via TorchGeo.
 
-    TODO (your turn):
-      1. `from torchgeo.datasets import EuroSAT`
-      2. Return `EuroSAT(root=str(root), download=download)`.
-      3. Inspect one sample: it's a dict with an image tensor and a label. Print
-         its shape and dtype, and note how many bands Sentinel-2 has.
-
-    Kept as a scaffold so the chemistry of loading real imagery is something you
-    do hands-on (and can therefore talk about in an interview).
+    Downloads to ``root`` on first use. Requires the ``torch`` extra.
     """
-    raise NotImplementedError(
-        "Implement load_eurosat using torchgeo.datasets.EuroSAT — see the TODO."
-    )
+    from torchgeo.datasets import EuroSAT
+    return EuroSAT(root=str(root), download=download)
 
 
 def to_features(dataset) -> tuple:
-    """Turn an image dataset into a plain (X, y) feature table for a quick baseline.
+    """Reduce each patch to simple per-band features for a quick baseline.
 
-    TODO (your turn): a strong first baseline needs no deep learning —
-      1. For each sample, compute a few per-band summary statistics (mean, std)
-         and the mean NDVI (use `eolandcover.indices.ndvi` on the NIR/red bands).
-      2. Stack these into X (n_samples, n_features) and collect labels y.
-      3. Hand X, y to a scikit-learn classifier (see examples/02_train_baseline.py).
-    This "simple features first" step is a good sanity check before embeddings.
+    Per-band mean and std over the patch's pixels plus mean NDVI, giving an
+    (N, 2*C + 1) feature matrix X and integer labels y for a scikit-learn model.
     """
-    raise NotImplementedError("Implement to_features — see the TODO.")
+    B4, B8 = 3, 7   # red/NIR channel indices
+
+    feats, labels = [], []
+    for sample in dataset:
+        img = sample["image"].float()          # (C, H, W) torch tensor
+        mean = img.mean(dim=(1, 2))            # length C  (mean over the H*W pixels, per band)
+        std  = img.std(dim=(1, 2))             # length C
+        ndvi_mean = ndvi(img[B8], img[B4]).mean()   # scalar, mean NDVI over the patch
+        vec = np.concatenate([mean.numpy(), std.numpy(), [float(ndvi_mean)]])
+        feats.append(vec)
+        labels.append(int(sample["label"]))
+    X = np.stack(feats)        # (N, 2C+1)
+    y = np.array(labels)
+    return X, y
+
+
+

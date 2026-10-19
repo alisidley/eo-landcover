@@ -1,9 +1,8 @@
-"""Explore EuroSAT — your first hands-on step (needs the ``torch`` extra).
+"""Explore EuroSAT (needs the ``torch`` extra).
 
 Goal: build intuition for the data before modelling. Run after
 `pip install -e '.[torch]'`.
 
-This is a scaffold with TODOs — filling them in is the exercise.
 """
 from __future__ import annotations
 

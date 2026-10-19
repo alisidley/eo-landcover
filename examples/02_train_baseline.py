@@ -19,13 +19,19 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
 
 from sklearn.ensemble import RandomForestClassifier
 
-from eolandcover import accuracy, confusion_matrix, per_class_accuracy, stratified_split
+from eolandcover import (
+    accuracy,
+    confusion_matrix,
+    per_class_accuracy,
+    plot_confusion_matrix,
+    stratified_split,
+)
 from eolandcover.data import load_eurosat, to_features
 
 
 def main() -> None:
-    dataset = load_eurosat(root="data", download=True)  # implement in eolandcover.data
-    X, y = to_features(dataset)                          # implement in eolandcover.data
+    dataset = load_eurosat(root="data", download=True)
+    X, y = to_features(dataset)
 
     train_idx, val_idx, test_idx = stratified_split(y, random_state=0)
 
@@ -37,7 +43,11 @@ def main() -> None:
         print(f"{name}: accuracy = {accuracy(y[idx], pred):.3f}")
         if name == "test":
             print("per-class accuracy:", per_class_accuracy(y[idx], pred))
-            print("confusion matrix:\n", confusion_matrix(y[idx], pred))
+            cm = confusion_matrix(y[idx], pred)
+            print("confusion matrix:\n", cm)
+            class_names = getattr(dataset, "classes", None)
+            path = plot_confusion_matrix(cm, class_names, path="assets/confusion_matrix.png")
+            print(f"saved {path}")
 
 
 if __name__ == "__main__":

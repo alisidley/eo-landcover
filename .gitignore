@@ -15,6 +15,10 @@ data/
 *.tif
 *.tiff
 
+# Scratch / throwaway experiment files
+scratch.py
+scratch_*.py
+
 # OS / editors
 .DS_Store
 .vscode/
